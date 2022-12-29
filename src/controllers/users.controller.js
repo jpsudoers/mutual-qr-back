@@ -12,10 +12,12 @@ export const getUser = async (req, res) => {
 }
 
 export const postLogin = async (req, res) => {
-    const {rut, password} = req.params;
+    const {id, password} = req.body;
+    console.log(req.body)
     try {
         const pool = await getConnection();
-        const result = await pool.request().query(`exec [dbo].[InicioSesion] '${rut}','${password}'`);
+        const result = await pool.request().query(`exec [dbo].[InicioSesion] '${id}','${password}'`);
+        console.log(result);
         if (result.recordset[0]['Respuesta'] === 'Usuario No Válido') {
             res.status(203).json('No autorizado');
         } else {
