@@ -1,10 +1,29 @@
 import {getConnection} from "../database/connection";
 
-const getUser = async (req, res) => {
+export const getUser = async (req, res) => {
     const {rut} = req.params;
-    const pool = await getConnection();
-    const result = await pool.request().query(`exec [dbo].[LectorQR] '${rut}',1`);
-    res.json(result.recordset)
+    try {
+        const pool = await getConnection();
+        const result = await pool.request().query(`exec [dbo].[LectorQR] '${rut}',1`);
+        res.json(result.recordset)
+    } catch (e) {
+        console.log(e)
+    }
 }
 
-export default getUser;
+export const postLogin = async (req, res) => {
+    const {rut, password} = req.params;
+    try {
+        const pool = await getConnection();
+        const result = await pool.request().query(`exec [dbo].[InicioSesion] '${rut}','${password}'`);
+        if (result.recordset[0]['Respuesta'] === 'Usuario No Válido') {
+            res.status(203).json('No autorizado');
+        } else {
+            res.status(200)
+            res.json(result.recordset)
+        }
+    } catch (e) {
+        console.log(e)
+    }
+}
+
